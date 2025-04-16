@@ -43,6 +43,10 @@ public class Ennemie : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        //if (other.)
+        {
+            
+        }
 
         if (other.CompareTag("Player"))
         {
@@ -55,7 +59,7 @@ public class Ennemie : MonoBehaviour
 
             if(type == EnnemieType.Slow)
             {
-                vehicle.speed = 1.5f;
+                vehicle.SlowDown();
             }
         }
     }

@@ -13,6 +13,7 @@ namespace PathCreation.Examples
         public PathCreator pathCreator;
         public EndOfPathInstruction endOfPathInstruction;
         public Camera camera;
+        public AudioSource audioSource;
         public float speed = 5;
         public float widthOffset;
         public float offsetSpeed = 1.0f;
@@ -26,6 +27,7 @@ namespace PathCreation.Examples
         private float currentOffset;
         private InputSystem_Actions controls;
         private bool canRotate = true;
+        private bool isRotated = false;
 
 
         public void OnEnable()
@@ -81,7 +83,12 @@ namespace PathCreation.Examples
 
         void Update()
         {
-
+            
+            if (isRotated == true && canRotate == true)
+            {
+                camera.transform.Rotate(0, 0, Mathf.MoveTowards(0, 180, Time.deltaTime * 180));
+            }
+            
             if (pathCreator != null)
             {
                 if (startFromEnd)
@@ -115,19 +122,50 @@ namespace PathCreation.Examples
 
         public void RotateCamera()
         {   
-            if(canRotate == true)
+            if(isRotated == false)
             {
-                canRotate = false;
-                camera.transform.Rotate(0, 0, 180);
-                StartCoroutine(ResetCanRotate(5f));
+                isRotated = true;
+                canRotate = true;
+                StartCoroutine(ResetCanRotate(1f));
             }   
         }
+
+        public void SlowDown()
+        {
+            speed = speed / 2;
+            audioSource.pitch = audioSource.pitch / 2;
+            StartCoroutine(ResetSpeed(3f));
+        }
+
+        IEnumerator ResetSpeed(float duration)
+        {
+            yield return new WaitForSeconds(duration);
+            speed = speed * 2;
+            audioSource.pitch = audioSource.pitch * 2;
+        }
+
+
 
         IEnumerator ResetCanRotate(float duration)
         {
             yield return new WaitForSeconds(duration);
-            camera.transform.Rotate(0, 0, 180);
+            canRotate = false;
+            StartCoroutine(ReturnToNormal(5f));
+        }
+
+        IEnumerator ReturnToNormal(float duration)
+        {
+            yield return new WaitForSeconds(duration);
+            isRotated = true;
             canRotate = true;
+            StartCoroutine(ResetCameraZ(1f));
+        }
+
+        IEnumerator ResetCameraZ(float duration)
+        {
+            yield return new WaitForSeconds(duration);
+            canRotate = false;
+            isRotated = false;
         }
 
     }
